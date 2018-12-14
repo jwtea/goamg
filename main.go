@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 )
 
@@ -35,11 +34,13 @@ func main() {
 }
 
 func (s *Scanner) visit(fp string, f os.FileInfo, err error) error {
-	if path.Ext(fp) != ".json" && !f.IsDir() {
-		s.Directory.Filepaths = append(s.Directory.Filepaths, f.Name())
-		s.Directory.Size += f.Size()
-		s.Size = s.Size + f.Size()
+	if f.IsDir() && f.Name() == ".git" {
+		return filepath.SkipDir
 	}
+
+	s.Directory.Filepaths = append(s.Directory.Filepaths, f.Name())
+	s.Directory.Size += f.Size()
+	s.Size = s.Size + f.Size()
 
 	return nil
 }
